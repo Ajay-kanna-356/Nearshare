@@ -1,36 +1,44 @@
 const express = require("express");
 const connectDB = require('./config/db');
 const mongoose = require('mongoose');
+const multer = require('multer');
 const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public')); 
 connectDB();
+app.use('/uploads', express.static('uploads'));
 const User = require('./models/userModel');
+const Post = require('./models/postModel');
 
-mongoose.connection.once('open', async () => {
-  try {
-    const newUser = await User.create({
-      name: 'Stark',
-      phoneNum: '1234567890',
-      emailId: 'stark@example.com',
-      password: 'passwordisnopassword'
-    });
+const session = require('express-session');
 
-    console.log('Inserted User:', newUser);
-  } catch (error) {
-    console.error('Error inserting user:', error.message);
+app.use(session({
+  secret: 'project-secret-key',   // used to sign and encrypt the session ID cookie
+  resave: false,
+  saveUninitialized: true,
+}));
+
+// Setting up multer disk storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // save in uploads folder
+  },
+  filename: function (req, file, cb) {
+    // Saving with timestamp + original name to avoid duplicate names
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
- 
+
+const upload = multer({ storage: storage });
+
+ // Home page
 app.get("/",(req,res) =>{    
     res.sendFile(__dirname+"/public/login.html");
 });
 
-
 app.post("/",async(req,res) =>{
     const {email,password} = req.body;
-    console.log(email,password);
     try {
     // Find user by their username OR email — depends on your schema
     const user = await User.findOne({ emailId: email }); 
@@ -43,7 +51,7 @@ app.post("/",async(req,res) =>{
     if (user.password !== password) {
       return res.status(400).send('Incorrect password.'); // For now it is Showing As Error Message Further Will Be Enhanced
     }
-
+    req.session.email = email; 
     //Successful login
     res.sendFile(__dirname + "/public/home.html");
 
@@ -52,14 +60,13 @@ app.post("/",async(req,res) =>{
     res.status(500).send('Database Server Error, please try again.');
   }
 });
-
+// Register page
 app.get("/register",(req,res) =>{
     res.sendFile(__dirname+"/public/register.html")
 })
 app.post("/register",async(req,res) =>{
     const {name,phone,email,password,cpassword} = req.body;
     
-    console.log(name,phone,email,password,cpassword);
     
     // Confirm password Check 
     if(password === cpassword){ 
@@ -83,11 +90,35 @@ app.post("/register",async(req,res) =>{
     else{
     res.status(400).send(("Password Does Not Match Confirm Password"))
     res.sendFile(__dirname+"/public/register.html")
-    }
-
-    
+    } 
 });
+// Home page
+app.get("/home",(req,res) =>{
+  res.sendFile(__dirname+"/public/home.html")
+})
+// Post page
+app.get("/post",(req,res) =>{
+  res.sendFile(__dirname+"/public/post.html");
+})
+app.post("/post",upload.single('img'),async(req,res) =>{
+  const {name,description,category} = req.body;
+  const img = req.file;
+  console.log(name,description,category,img.path,req.session.email);
+  try{
+    const newpost = await Post.create({
+      name:name,
+      description:description,
+      emailId:req.session.email,
+      category:category,
+      imgpath:img.path
+    })
+    res.sendFile(__dirname+"/public/home.html");
 
+  }
+  catch(error){
+    res.status(400).send((" Some error occured try again"))
+  }
+})
 app.listen(2000,() =>{
     console.log("server running in 2000");
 })
