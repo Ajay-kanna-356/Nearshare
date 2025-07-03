@@ -3,6 +3,8 @@ const connectDB = require('./config/db');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const app = express();
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views'); // folder where your .ejs files are
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public')); 
@@ -53,7 +55,7 @@ app.post("/",async(req,res) =>{
     }
     req.session.email = email; 
     //Successful login
-    res.sendFile(__dirname + "/public/home.html");
+    res.redirect("/home");
 
   } catch (error) {
     console.error('Error:', error.message);
@@ -93,8 +95,11 @@ app.post("/register",async(req,res) =>{
     } 
 });
 // Home page
-app.get("/home",(req,res) =>{
-  res.sendFile(__dirname+"/public/home.html")
+app.get("/home",async(req,res) =>{
+  const posts = await Post.find();
+  console.log(posts);
+  res.render("home", { posts });
+   
 })
 // Post page
 app.get("/post",(req,res) =>{
@@ -112,10 +117,11 @@ app.post("/post",upload.single('img'),async(req,res) =>{
       category:category,
       imgpath:img.path
     })
-    res.sendFile(__dirname+"/public/home.html");
+    res.redirect("/home");
 
   }
   catch(error){
+  console.error('Error while inserting post:', error.message);
     res.status(400).send((" Some error occured try again"))
   }
 })
