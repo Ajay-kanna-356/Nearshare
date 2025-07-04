@@ -97,6 +97,7 @@ app.post("/register",async(req,res) =>{
 // Home page
 app.get("/home",async(req,res) =>{
   const posts = await Post.find();
+  posts.reverse()
   console.log(posts);
   res.render("home", { posts });
    
@@ -106,15 +107,18 @@ app.get("/post",(req,res) =>{
   res.sendFile(__dirname+"/public/post.html");
 })
 app.post("/post",upload.single('img'),async(req,res) =>{
-  const {name,description,category} = req.body;
+  const {name,description,category,condition} = req.body;
   const img = req.file;
-  console.log(name,description,category,img.path,req.session.email);
+  console.log(name,description,category,img.path,req.session.email,condition);
   try{
+    const user = await User.findOne({ emailId: req.session.email });
     const newpost = await Post.create({
       name:name,
       description:description,
       emailId:req.session.email,
+      username: user.name,
       category:category,
+      condition:condition,
       imgpath:img.path
     })
     res.redirect("/home");
@@ -125,6 +129,45 @@ app.post("/post",upload.single('img'),async(req,res) =>{
     res.status(400).send((" Some error occured try again"))
   }
 })
+
+// Search Page
+
+app.get("/searchpage",(req,res)=>{
+    res.sendFile(__dirname+"/public/search.html")
+})
+
+app.get("/search", async(req,res)=>{
+    try {
+    const { name, category, condition } = req.query;
+    const query = {};
+
+    // Search By Name
+    if (name) {
+      query.name = new RegExp(name, 'i'); // case-insensitive
+    }
+    // Search By Category
+    if (category) {
+      query.category = new RegExp(category, 'i'); // case-insensitive
+    }
+    // Search By Condition
+    if (condition) {
+      query.condition = condition; // exact match
+    }
+
+    // Fetch all matching posts
+    const posts = await Post.find(query);
+
+    // Respond with the list of posts as JSON
+   
+    res.render("result", { posts });
+    
+  } catch (error) {
+    console.error('Error searching posts:', error.message);
+    res.status(500).send('Server error.');
+  }
+});
+
+
 app.listen(2000,() =>{
     console.log("server running in 2000");
 })
