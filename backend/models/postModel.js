@@ -8,7 +8,8 @@ const postSchema = new mongoose.Schema(
     username: { type: String, required: true },
     category: { type: String, required: true },
     condition: {type: String, required: true, enum: ['new', 'used', 'refurbished']},
-    imgpath: { type: String, required: true }
+    imgpath: { type: String, required: true },
+    status: {type:String, default:"active", enum:["active","sold"]}
   },
 );
 

@@ -9,17 +9,41 @@
     <% if (userposts.length === 0) { %>
         <p>No posts have been posted</p>
    <% } %> 
-  <div class = "posts"><% userposts.forEach(post => { %>
-    
-   <div class="post">
-      <h2><%=post.name %> </h2> 
+
+  <form method="GET" action="/history">
+   <label for="status">Filter by Status:</label>
+    <select name="status">
+      <option value="">All</option>
+      <option value="active" <%= (typeof status !== 'undefined' && status === 'active') ? 'selected' : '' %>>Active</option>
+      <option value="sold" <%= (typeof status !== 'undefined' && status === 'sold') ? 'selected' : '' %>>Sold</option>
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+<br>
+
+  <div class="posts">
+  <% userposts.forEach(post => { %>
+    <div class="post">
+      <h2><%= post.name %></h2>
       <br>
       <img src="/<%= post.imgpath %>">
-      <h2><%=post.username %> </h2>
+      <h2><%= post.username %></h2>
+      <p><%= post.description %></p>
 
-      <p><%=post.description %></p>
-   </div>
- <% }); %> </div>
+      <% if (post.status === 'active') { %>
+        <form method="POST" action="/mark_sold/<%= post._id %>" onsubmit="return confirm('Mark this post as sold?');">
+          <p style="color: rgb(78, 130, 1);"><strong>Active</strong></p>
+          <button type="submit" class="sold">Mark As Sold</button>
+
+        </form>
+      <% } else { %>
+        <p style="color: red;"><strong>Sold</strong></p>
+      <% } %>
+
+    </div>
+  <% }); %>
+</div>
+
  <style>
   .posts {
   display: flex;
@@ -61,4 +85,5 @@
 
  </style>
 </body>
+
 </html>

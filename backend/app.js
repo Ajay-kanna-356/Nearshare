@@ -103,7 +103,7 @@ app.post("/register",async(req,res) =>{
 });
 // Home page
 app.get("/home",requireLogin,async(req,res) =>{
-  const posts = await Post.find();
+  const posts = await Post.find({status:"active"});
   posts.reverse()
   console.log(posts);
   res.render("home", { posts });
@@ -146,7 +146,7 @@ app.get("/searchpage",requireLogin,(req,res)=>{
 app.get("/search", async(req,res)=>{
     try {
     const { name, category, condition } = req.query;
-    const query = {};
+    const query = {status:"active"};
 
     // Search By Name
     if (name) {
@@ -176,8 +176,14 @@ app.get("/search", async(req,res)=>{
 
 // History page
 app.get("/history",requireLogin,async(req,res) =>{
-  const userposts = await Post.find({emailId: req.session.email});
-  res.render("history",{userposts});
+  
+  const query = {emailId: req.session.email}
+  const { status } = req.query;
+  if (status){
+    query.status = status
+  }
+  const userposts = await Post.find(query).sort({_id:-1});
+  res.render("history",{userposts,status});
 })
 // details page
 app.get('/details',requireLogin, async(req, res) => {
@@ -186,6 +192,21 @@ app.get('/details',requireLogin, async(req, res) => {
   const  user = await User.findOne({ emailId: email })
   res.render("details", { user });
 });
+
+
+// Delete or Sold
+app.post('/mark_sold/:id', async (req, res) => {
+  try {
+    const postId = req.params.id
+    await Post.findByIdAndUpdate(postId, { status: "sold" });
+    res.redirect('/history');
+  } catch (error) {
+    console.error('Error Marking post:', error.message);
+    res.status(500).send('Failed to Mark As Sold Post');
+  }
+});
+
+
 
 //logout 
 app.get('/logout', (req, res) => {
