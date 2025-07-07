@@ -9,10 +9,13 @@
 <body>
   <button onclick="window.location.href='/post'">Post</button>
   <button onclick="window.location.href='/searchpage'">Search</button>
-  
+  <button onclick="window.location.href='/history'">My Posts</button>
+  <button onclick="window.location.href='/logout'">Log Out</button>
+
   <div class = "posts"><% posts.forEach(post => { %>
     
    <div class="post">
+      <button onclick="window.location.href='/details?email=<%= post.emailId %>'">Get Details</button>
       <h2><%=post.name %> </h2> 
       <br>
       <img src="/<%= post.imgpath %>">

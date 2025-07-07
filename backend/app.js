@@ -6,6 +6,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views'); // folder where your .ejs files are
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public')); 
 connectDB();
@@ -32,6 +33,13 @@ const storage = multer.diskStorage({
   }
 });
 
+function requireLogin(req, res, next) {
+  if (req.session.email) {
+    next(); // User is logged in, proceed
+  } else {
+    res.redirect('/'); // Not logged in, redirect to login page
+  }
+}
 const upload = multer({ storage: storage });
 
  // Home page
@@ -50,8 +58,8 @@ app.post("/",async(req,res) =>{
       return res.status(400).send('User not found.');
     }
     // Password Check 
-    if (user.password !== password) {
-      return res.status(400).send('Incorrect password.'); // For now it is Showing As Error Message Further Will Be Enhanced
+    if (!await bcrypt.compare(password, user.password)) {
+      return res.status(400).send('Incorrect password.'); 
     }
     req.session.email = email; 
     //Successful login
@@ -68,17 +76,16 @@ app.get("/register",(req,res) =>{
 })
 app.post("/register",async(req,res) =>{
     const {name,phone,email,password,cpassword} = req.body;
-    
-    
     // Confirm password Check 
     if(password === cpassword){ 
      try {
     // Inserting User Into MongoDB
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       name: name,
       phoneNum: phone,
       emailId: email,
-      password: password
+      password: hashedPassword
     });
 
     console.log('Inserted user:', newUser);
@@ -95,7 +102,7 @@ app.post("/register",async(req,res) =>{
     } 
 });
 // Home page
-app.get("/home",async(req,res) =>{
+app.get("/home",requireLogin,async(req,res) =>{
   const posts = await Post.find();
   posts.reverse()
   console.log(posts);
@@ -103,7 +110,7 @@ app.get("/home",async(req,res) =>{
    
 })
 // Post page
-app.get("/post",(req,res) =>{
+app.get("/post",requireLogin,(req,res) =>{
   res.sendFile(__dirname+"/public/post.html");
 })
 app.post("/post",upload.single('img'),async(req,res) =>{
@@ -132,7 +139,7 @@ app.post("/post",upload.single('img'),async(req,res) =>{
 
 // Search Page
 
-app.get("/searchpage",(req,res)=>{
+app.get("/searchpage",requireLogin,(req,res)=>{
     res.sendFile(__dirname+"/public/search.html")
 })
 
@@ -167,7 +174,29 @@ app.get("/search", async(req,res)=>{
   }
 });
 
+// History page
+app.get("/history",requireLogin,async(req,res) =>{
+  const userposts = await Post.find({emailId: req.session.email});
+  res.render("history",{userposts});
+})
+// details page
+app.get('/details',requireLogin, async(req, res) => {
+  const email = req.query.email;
+  // Use the email to find the post or user
+  const  user = await User.findOne({ emailId: email })
+  res.render("details", { user });
+});
 
+//logout 
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error("Logout error:", err);
+      return res.status(500).send("Could not log out.");
+    }
+    res.redirect('/');
+  });
+});
 app.listen(2000,() =>{
     console.log("server running in 2000");
 })

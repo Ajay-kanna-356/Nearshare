@@ -9,7 +9,14 @@
 <h2>Search</h2>
 <form action="/search" method="GET">
   <input type="text" name="name" placeholder="Name" /><br><br>
-  <input type="text" name="category" placeholder="Category" /><br><br>
+  <select name="category">
+    <option value="">-- Category --</option>
+    <option value="accessories">Accessories</option>
+    <option value="kitchen">Kitchen Products</option>
+    <option value="furniture">Furnitures</option>
+    <option value="clothes">Clothes</option>
+    <option value="electronics">Electronics</option>
+  </select><br><br>
   <select name="condition">
     <option value="">-- Any Condition --</option>
     <option value="new">New</option>
