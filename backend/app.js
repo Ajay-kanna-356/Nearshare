@@ -7,12 +7,24 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views'); // folder where your .ejs files are
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(express.static('public')); 
 connectDB();
 app.use('/uploads', express.static('uploads'));
 const User = require('./models/userModel');
 const Post = require('./models/postModel');
+const cors = require('cors');
+
+
+app.use(express.json());
+
+// Middleware to parse URL-encoded data (from forms)
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: 'http://localhost:3000', // React app origin
+  credentials: true
+}));
+
 
 const session = require('express-session');
 
@@ -43,11 +55,10 @@ function requireLogin(req, res, next) {
 const upload = multer({ storage: storage });
 
  // Home page
-app.get("/",(req,res) =>{    
-    res.sendFile(__dirname+"/public/login.html");
-});
+
 
 app.post("/",async(req,res) =>{
+    console.log(req.body)
     const {email,password} = req.body;
     try {
     // Find user by their username OR email — depends on your schema
@@ -63,7 +74,7 @@ app.post("/",async(req,res) =>{
     }
     req.session.email = email; 
     //Successful login
-    res.redirect("/home");
+    return res.status(200).send('success')
 
   } catch (error) {
     console.error('Error:', error.message);
@@ -106,8 +117,7 @@ app.get("/home",requireLogin,async(req,res) =>{
   const posts = await Post.find({status:"active"});
   posts.reverse()
   console.log(posts);
-  res.render("home", { posts });
-   
+  res.json(posts)
 })
 // Post page
 app.get("/post",requireLogin,(req,res) =>{
