@@ -149,10 +149,6 @@ app.post("/post",upload.single('img'),async(req,res) =>{
 
 // Search Page
 
-app.get("/searchpage",requireLogin,(req,res)=>{
-    res.sendFile(__dirname+"/public/search.html")
-})
-
 app.get("/search", async(req,res)=>{
     try {
     const { name, category, condition } = req.query;
@@ -176,7 +172,7 @@ app.get("/search", async(req,res)=>{
 
     // Respond with the list of posts as JSON
    
-    res.render("result", { posts });
+    res.json(posts)
     
   } catch (error) {
     console.error('Error searching posts:', error.message);
@@ -193,7 +189,7 @@ app.get("/history",requireLogin,async(req,res) =>{
     query.status = status
   }
   const userposts = await Post.find(query).sort({_id:-1});
-  res.render("history",{userposts,status});
+  res.json({userposts,status});
 })
 // details page
 app.get('/details',requireLogin, async(req, res) => {
@@ -209,7 +205,6 @@ app.post('/mark_sold/:id', async (req, res) => {
   try {
     const postId = req.params.id
     await Post.findByIdAndUpdate(postId, { status: "sold" });
-    res.redirect('/history');
   } catch (error) {
     console.error('Error Marking post:', error.message);
     res.status(500).send('Failed to Mark As Sold Post');

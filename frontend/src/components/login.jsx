@@ -27,7 +27,7 @@ function Login() {
   return (
     <div>
       <h2>Login</h2>
-      {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
+      
       <form onSubmit={handleLogin}>
         <label>Email:</label>
         <input
@@ -48,6 +48,7 @@ function Login() {
         <button type="submit">Login</button>
         &nbsp;&nbsp;
         <a href="/register">Register</a>
+        {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       </form>
     </div>
   );
