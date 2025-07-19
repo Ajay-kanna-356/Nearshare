@@ -58,7 +58,6 @@ const upload = multer({ storage: storage });
 
 
 app.post("/",async(req,res) =>{
-    console.log(req.body)
     const {email,password} = req.body;
     try {
     // Find user by their username OR email — depends on your schema
@@ -82,41 +81,35 @@ app.post("/",async(req,res) =>{
   }
 });
 // Register page
-app.get("/register",(req,res) =>{
-    res.sendFile(__dirname+"/public/register.html")
-})
-app.post("/register",async(req,res) =>{
-    const {name,phone,email,password,cpassword} = req.body;
-    // Confirm password Check 
-    if(password === cpassword){ 
-     try {
-    // Inserting User Into MongoDB
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
-      name: name,
-      phoneNum: phone,
-      emailId: email,
-      password: hashedPassword
-    });
 
-    console.log('Inserted user:', newUser);
-    res.sendFile(__dirname + "/public/login.html");
-  } catch (error) {
-    console.error('Error inserting user:', error.message);
-    res.status(500).send('Error occurred, please try again.');
-  }
+app.post("/register", async (req, res) => {
+  const { name, phone, email, password, cpassword } = req.body;
+
+  if (password === cpassword) {
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await User.create({
+        name: name,
+        phoneNum: phone,
+        emailId: email,
+        password: hashedPassword
+      });
+
+      console.log('Inserted user:', newUser);
+      res.status(200).send("User registered successfully");
+    } catch (error) {
+      console.error('Error inserting user:', error.message);
+      res.status(500).send('Error occurred, please try again.');
     }
-
-    else{
-    res.status(400).send(("Password Does Not Match Confirm Password"))
-    res.sendFile(__dirname+"/public/register.html")
-    } 
+  } else {
+    res.status(400).send("Password Does Not Match Confirm Password");
+  }
 });
+
 // Home page
 app.get("/home",requireLogin,async(req,res) =>{
   const posts = await Post.find({status:"active"});
   posts.reverse()
-  console.log(posts);
   res.json(posts)
 })
 // Post page
@@ -196,7 +189,7 @@ app.get('/details',requireLogin, async(req, res) => {
   const email = req.query.email;
   // Use the email to find the post or user
   const  user = await User.findOne({ emailId: email })
-  res.render("details", { user });
+  res.json({user});
 });
 
 

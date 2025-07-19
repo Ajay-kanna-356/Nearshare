@@ -33,9 +33,10 @@ function Home() {
             <img src={`http://localhost:2000/${post.imgpath}`} alt="Post" />
             <h2>{post.username}</h2>
             <p>{post.description}</p>
-            <button onClick={() => window.location.href = `/details?email=${post.emailId}`}>
-              Get Details
-            </button>
+          <button onClick={() => navigate(`/details?email=${post.emailId}`)}>
+          Get Details
+          </button>
+
           </div>
         ))}
       </div>

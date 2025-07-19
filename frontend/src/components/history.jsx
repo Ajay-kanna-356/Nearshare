@@ -20,7 +20,7 @@ function History() {
 
   useEffect(() => {
     fetchPosts();
-  }, [status]); // refresh when status changes
+  }, [posts]); // refresh when status changes
 
   
   const markAsSold = async (postId) => {
