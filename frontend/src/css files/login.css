@@ -1,0 +1,21 @@
+/* Reset default margin and padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.body{
+    background-color: #E4F9F5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.box{
+    background-color: #11999E;
+    border: 5px solid black;
+    border-radius: 25px;
+    padding:30px;
+    margin-top: 50px;
+}

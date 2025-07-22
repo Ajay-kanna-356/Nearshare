@@ -1,6 +1,8 @@
 // src/components/Register.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import "../css files/login.css"
+import Input from "./inputbox";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -47,30 +49,33 @@ function Register() {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
+    <div className='body'>
+    <div className='box'>      
+    <h2>Register</h2>
       {error && <p style={{color:"red"}}>{error}</p>}
       {success && <p style={{color:"green"}}>{success}</p>}
 
       <form onSubmit={handleSubmit}>
         <label>Name:</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} required /><br /><br />
+        <Input type="text" name="name" value={formData.name} onChange={handleChange} required />
 
         <label>Phone no:</label>
-        <input type="text" name="phone" value={formData.phone} onChange={handleChange} required /><br /><br />
+        <Input type="text" name="phone" value={formData.phone} onChange={handleChange} required />
 
         <label>Email-id:</label>
-        <input type="text" name="email" value={formData.email} onChange={handleChange} required /><br /><br />
+        <Input type="text" name="email" value={formData.email} onChange={handleChange} required />
 
         <label>Create Password:</label>
-        <input type="password" name="password" value={formData.password} onChange={handleChange} required /><br /><br />
+        <Input type="password" name="password" value={formData.password} onChange={handleChange} required />
 
         <label>Confirm Password:</label>
-        <input type="password" name="cpassword" value={formData.cpassword} onChange={handleChange} required /><br /><br />
+        <Input type="password" name="cpassword" value={formData.cpassword} onChange={handleChange} required />
 
         <button type="submit">Register</button>
       </form>
     </div>
+    </div>
+
   );
 }
 

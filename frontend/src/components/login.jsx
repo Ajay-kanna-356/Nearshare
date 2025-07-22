@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import '../css files/login.css';
+import Input from './inputbox';
 function Login() {
   const navigate = useNavigate(); // ✅ Declare here
   const [email, setEmail] = useState('');
@@ -18,32 +19,34 @@ function Login() {
       
       navigate('/home'); // ✅ Redirect after successful login
     } catch (error) {
-      console.log(error)
-      console.error('Login error:', error.response?.data || error.message);
       setErrorMsg(error.response?.data || 'Login failed');
     }
   };
 
   return (
-    <div>
+    <div className='body'>
+    <div className='box'>
       <h2>Login</h2>
       
       <form onSubmit={handleLogin}>
-        <label>Email:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        /><br /><br />
+      <Input
+        label="Email:"
+        type="email"
+        name="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        required 
+        error={errorMsg.includes('email') ? errorMsg : ''}
+      />
 
-        <label>Password:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        /><br /><br />
+        <Input 
+         label = "Password:"
+         type="password"
+         name="password"
+         value= {password}
+         onChange={e => setPassword(e.target.value)}
+         required
+        />
 
         <button type="submit">Login</button>
         &nbsp;&nbsp;
@@ -51,6 +54,7 @@ function Login() {
         {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       </form>
     </div>
+  </div>
   );
 }
 
