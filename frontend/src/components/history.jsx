@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Button from "./button";
 
 function History() {
   const [posts, setPosts] = useState([]);
@@ -65,7 +66,7 @@ function History() {
               {post.status === "active" ? (
                 <>
                   <p style={{ color: "green" }}><strong>Active</strong></p>
-                  <button onClick={() => markAsSold(post._id)}>Mark As Sold</button>
+                  <Button onClick={() => markAsSold(post._id)}>Mark As Sold</Button>
                 </>
               ) : (
                 <p style={{ color: "red" }}><strong>Sold</strong></p>

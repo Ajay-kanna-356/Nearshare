@@ -1,0 +1,43 @@
+.drop {
+  width: 12em;
+  margin:10px;
+  font-family: sans-serif;
+  color: #86919a;
+  text-transform: uppercase;
+  position: relative;
+  background: #485761;
+  cursor: pointer;
+}
+
+.option {
+  padding: 0.7em;
+  background-color: #485761;
+  transition: background-color 0.2s;
+}
+
+.option.placeholder {
+  font-weight: bold;
+  cursor: default;
+}
+
+.option:hover:not(.placeholder) {
+  background-color: #5aafee;
+  color: #fff;
+}
+
+.option.active {
+  background-color: #5aafee;
+  color: #fff;
+}
+
+.drop.visible .option {
+  display: block;
+}
+
+.option:not(.placeholder) {
+  display: none;
+}
+
+.drop.visible .option:not(.placeholder) {
+  display: block;
+}

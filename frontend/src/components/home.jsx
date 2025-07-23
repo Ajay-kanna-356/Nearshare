@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Home.css'; 
 import { useNavigate } from 'react-router-dom';
+import Button from './button';
 
 
 function Home() {
@@ -19,10 +20,10 @@ function Home() {
 
   return (
     <div>
-      <button onClick={()=> navigate('/post')}>Post</button>
-      <button onClick={()=> navigate('/search')}>Search</button>
-      <button onClick={()=> navigate('/history')}>My Posts</button>
-      <button onClick={()=> navigate('/')}>Log Out</button>
+      <Button onClick={()=> navigate('/post')}>Post</Button>
+      <Button onClick={()=> navigate('/search')}>Search</Button>
+      <Button onClick={()=> navigate('/history')}>My Posts</Button>
+      <Button onClick={()=> navigate('/')}>Log Out</Button>
 
       <div className="posts">
         {posts.map((post, index) => (
@@ -33,9 +34,9 @@ function Home() {
             <img src={`http://localhost:2000/${post.imgpath}`} alt="Post" />
             <h2>{post.username}</h2>
             <p>{post.description}</p>
-          <button onClick={() => navigate(`/details?email=${post.emailId}`)}>
+          <Button onClick={() => navigate(`/details?email=${post.emailId}`)}>
           Get Details
-          </button>
+          </Button>
 
           </div>
         ))}

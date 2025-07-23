@@ -1,8 +1,9 @@
 //Search.js
 import React, { useState } from 'react';
-
+import Button from './button';
 import { useNavigate } from 'react-router-dom';
 import Dropdown from './dropdown';
+import Input from './inputbox';
 function Search() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
@@ -20,14 +21,16 @@ function Search() {
     <div>
       <h2>Search</h2>
       <form onSubmit={handleSearch}>
-        <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} /><br /><br />
+        <Input type="text" name="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name"
+/>
+<br /><br />
         <Dropdown options={[
         { name: "Accessories", value: "accessories" },
         { name: "Kitchen Products", value: "kitchen" },
         { name: "Furnitures", value: "furniture" },
         { name: "Clothes", value: "clothes" },
         { name: "Electronics", value: "electronics" }
-      ]}  value={category} label="-- Category --" onchange={e => setCategory(e.target.value)} /><br />
+      ]}  value={category} label="--Any Category --" onChange={e => setCategory(e.target.value)} /><br />
 
         <Dropdown
           options={[
@@ -37,10 +40,10 @@ function Search() {
           ]}
           value={condition}
           label="-- Any Condition --"
-          onchange={e => setCondition(e.target.value)}
+          onChange={e => setCondition(e.target.value)}
         /> 
         <br />
-        <button type="submit">Search</button>
+        <Button type="submit">Search</Button>
       </form>
     </div>
   );

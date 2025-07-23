@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { set } from "mongoose";
+import Input from "./inputbox";
 import Dropdown from "./dropdown";
+import Button from "./button";
 
 function Post(){
     const navigate = useNavigate();
@@ -49,19 +51,18 @@ function Post(){
     <div>
       
       <form onSubmit={handlePost}>
-        <label>Name</label>
-        <input
+        <Input
           type='text'
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={e => setName(e.target.value)} placeholder="Name"
           required
         /><br /><br />
 
-        <label>Description</label>
-        <input
+   
+        <Input
           type="text"
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={e => setDescription(e.target.value)} placeholder="Description"
           required
         /><br /><br />
         
@@ -71,7 +72,7 @@ function Post(){
         { name: "Furnitures", value: "furniture" },
         { name: "Clothes", value: "clothes" },
         { name: "Electronics", value: "electronics" }
-      ]}  value={category} label="-- Category --" onchange={e => setCategory(e.target.value)}/>
+      ]}  value={category} label="-- Category --" onChange={e => setCategory(e.target.value)}/>
         <br />
 
         <Dropdown
@@ -82,13 +83,13 @@ function Post(){
           ]}
           value={condition}
           label="-- Any Condition --"
-          onchange={e => setCondition(e.target.value)}
+          onChange={e => setCondition(e.target.value)}
         />
         <br />
         
         <label>Add Image:</label>
         <input type="file" name="img" accept="image/*" onChange={e=> setImgpath(e.target.files[0])}/>
-        <button type="submit" disabled={loading}>Post</button>
+        <Button type="submit" disabled={loading}>Post</Button>
         &nbsp;&nbsp;
         {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       </form>

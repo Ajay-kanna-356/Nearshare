@@ -4,6 +4,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../css files/login.css';
 import Input from './inputbox';
+import Button from './button';
+import { Link } from 'react-router-dom';
+
 function Login() {
   const navigate = useNavigate(); // ✅ Declare here
   const [email, setEmail] = useState('');
@@ -48,9 +51,9 @@ function Login() {
          required
         />
 
-        <button type="submit">Login</button>
+        <Button type="submit">Login</Button>
         &nbsp;&nbsp;
-        <a href="/register">Register</a>
+        <Link to="/register"><Button>Register</Button></Link>
         {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       </form>
     </div>

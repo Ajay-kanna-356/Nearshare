@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../css files/login.css"
 import Input from "./inputbox";
+import Button from "./button";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -71,7 +72,7 @@ function Register() {
         <label>Confirm Password:</label>
         <Input type="password" name="cpassword" value={formData.cpassword} onChange={handleChange} required />
 
-        <button type="submit">Register</button>
+        <Button type="submit">Register</Button>
       </form>
     </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import Button from './button';
 
 function SearchResults() {
   const [posts, setPosts] = useState([]);
@@ -25,7 +26,7 @@ function SearchResults() {
     
   return (
     <div>
-      <button className='searchbtn' onClick={()=>navigate('/search')}>Search</button>  
+      <Button className='searchbtn' onClick={()=>navigate('/search')}>Search</Button>  
       <h2>{posts.length} Results Found</h2>
       {posts.length === 0 ? (
         <p>No results found</p>
