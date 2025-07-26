@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Button from "./button";
+import Dropdown from "./dropdown";
 
 function History() {
   const [posts, setPosts] = useState([]);
@@ -21,7 +21,7 @@ function History() {
 
   useEffect(() => {
     fetchPosts();
-  }, [posts]); // refresh when status changes
+  }, [posts]); // refresh whenever post status changes
 
   
   const markAsSold = async (postId) => {
@@ -44,13 +44,12 @@ function History() {
   return (
     <div>
       <h2>My Posts</h2>
-
-      <label>Filter by Status: </label>
-      <select value={status} onChange={ e=> setStatus(e.target.value)}>
-        <option value="">All</option>
-        <option value="active">Active</option>
-        <option value="sold">Sold</option>
-      </select>
+      <Dropdown 
+      options={[{name:"Active",value:"active"},{name:"Sold",value:"sold"}]}
+      value = {status}
+      label= "Filter by Status:"
+      onChange = { e=> setStatus(e.target.value)}
+      />
 
       <div className="posts">
         {posts.length === 0 ? (
@@ -66,7 +65,7 @@ function History() {
               {post.status === "active" ? (
                 <>
                   <p style={{ color: "green" }}><strong>Active</strong></p>
-                  <Button onClick={() => markAsSold(post._id)}>Mark As Sold</Button>
+                  <button onClick={() => markAsSold(post._id)}>Mark As Sold</button>
                 </>
               ) : (
                 <p style={{ color: "red" }}><strong>Sold</strong></p>

@@ -7,7 +7,8 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views'); // folder where your .ejs files are
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-
+const https = require("https");
+const axios = require('axios');
 app.use(express.static('public')); 
 connectDB();
 app.use('/uploads', express.static('uploads'));
@@ -116,62 +117,139 @@ app.get("/home",requireLogin,async(req,res) =>{
 app.get("/post",requireLogin,(req,res) =>{
   res.sendFile(__dirname+"/public/post.html");
 })
-app.post("/post",upload.single('img'),async(req,res) =>{
-  const {name,description,category,condition} = req.body;
+app.post("/post", upload.single('img'), async (req, res) => {
+  const { name, description, category, condition, address } = req.body;
   const img = req.file;
-  console.log(name,description,category,img.path,req.session.email,condition);
-  try{
-    const user = await User.findOne({ emailId: req.session.email });
-    const newpost = await Post.create({
-      name:name,
-      description:description,
-      emailId:req.session.email,
-      username: user.name,
-      category:category,
-      condition:condition,
-      imgpath:img.path
-    })
-    res.redirect("/home");
+  const mykey = "4b5bc48ab4ab4bb1aa76d86232668660";
+  const url1 = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${mykey}`;
 
+  try {
+    const user = await User.findOne({ emailId: req.session.email });
+    if (!user) {
+      return res.status(401).send("User not logged in or session expired");
+    }
+
+    const response = await axios.get(url1);
+    const locationData = response.data;
+    const lat = locationData.features[0]?.geometry?.coordinates[1];
+    const lon = locationData.features[0]?.geometry?.coordinates[0];
+
+    if (lat === undefined || lon === undefined) {
+      return res.status(400).send("Could not determine location from address");
+    }
+
+    const newpost = await Post.create({
+      name,
+      description,
+      emailId: req.session.email,
+      username: user.name,
+      category,
+      condition,
+      imgpath: img.path,
+      address,
+      lat,
+      lon
+    });
+
+    res.redirect("/home");
+  } catch (error) {
+    console.error("Error while inserting post:", error.message);
+    res.status(400).send("Some error occurred. Try again.");
   }
-  catch(error){
-  console.error('Error while inserting post:', error.message);
-    res.status(400).send((" Some error occured try again"))
-  }
-})
+});
 
 // Search Page
 
-app.get("/search", async(req,res)=>{
-    try {
-    const { name, category, condition } = req.query;
-    const query = {status:"active"};
+app.get("/search", async (req, res) => {
+  try {
+    const { name, category, condition, address, radius } = req.query;
 
-    // Search By Name
+    // Create base query with only active posts
+    const query = { status: "active" };
+
+    // Search By Name (case-insensitive)
     if (name) {
-      query.name = new RegExp(name, 'i'); // case-insensitive
+      query.name = new RegExp(name, 'i');
     }
-    // Search By Category
+
+    // Search By Category (case-insensitive)
     if (category) {
-      query.category = new RegExp(category, 'i'); // case-insensitive
+      query.category = new RegExp(category, 'i');
     }
-    // Search By Condition
+
+    // Search By Condition (exact match)
     if (condition) {
-      query.condition = condition; // exact match
+      query.condition = condition;
     }
 
-    // Fetch all matching posts
-    const posts = await Post.find(query);
+    // Fetch all matching posts (before location filtering)
+    const allPosts = await Post.find(query);
 
-    // Respond with the list of posts as JSON
-   
-    res.json(posts)
-    
+    // If address and radius are provided, apply location-based filtering
+    if (address && radius) {
+      const apiKey = "4b5bc48ab4ab4bb1aa76d86232668660";
+      const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${apiKey}`;
+
+      // Make request to Geoapify to get lat and lon of the input address
+      https.get(url, (response) => {
+        let data = "";
+
+        response.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        response.on("end", () => {
+          const locationData = JSON.parse(data);
+          const centerLat = locationData.features[0]?.geometry?.coordinates[1]; // latitude
+          const centerLon = locationData.features[0]?.geometry?.coordinates[0]; // longitude
+
+          // If address is invalid or not found
+          if (centerLat === undefined || centerLon === undefined) {
+            return res.status(400).send("Invalid address");
+          }
+
+          // Filter posts by calculating distance from address coordinates
+          const filteredPosts = allPosts.filter((post) => {
+            const d = haversineDistance(centerLat, centerLon, post.lat, post.lon);
+            return d <= parseFloat(radius); // keep only posts within the radius
+          });
+
+          // Return filtered posts to frontend
+          res.json(filteredPosts);
+        });
+      });
+    } else {
+      // If no address or radius provided, return all matching posts
+      res.json(allPosts);
+    }
+
   } catch (error) {
     console.error('Error searching posts:', error.message);
     res.status(500).send('Server error.');
   }
 });
+
+// Function to calculate distance between two coordinates using Haversine formula
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  function toRad(x) {
+    return (x * Math.PI) / 180; // Convert degrees to radians
+  }
+
+  const R = 6371; // Radius of the Earth in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Returns distance in kilometers
+}
+
 
 // History page
 app.get("/history",requireLogin,async(req,res) =>{

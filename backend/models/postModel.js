@@ -9,8 +9,9 @@ const postSchema = new mongoose.Schema(
     category: { type: String, required: true },
     condition: {type: String, required: true, enum: ['new', 'used', 'refurbished']},
     imgpath: { type: String, required: true },
-    status: {type:String, default:"active", enum:["active","sold"]}
-  },
+    status: {type:String, default:"active", enum:["active","sold"]},
+    lat: {type: Number, required: true},
+    lon: {type: Number, required: true} },
 );
 
 module.exports = mongoose.model('Post', postSchema);
