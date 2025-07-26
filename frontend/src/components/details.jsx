@@ -2,35 +2,39 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function Details() {
-  const [user, setUser] = useState(null);
+  const [post, setPost] = useState(null);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const fetchPostDetails = async () => {
       const params = new URLSearchParams(window.location.search);
-      const email = params.get("email");
+      const postId = params.get("id");
+
       try {
-        const response = await axios.get(`http://localhost:2000/details?email=${email}`, {
+        const response = await axios.get(`http://localhost:2000/details?id=${postId}`, {
           withCredentials: true,
         });
-        setUser(response.data.user);
+
+        setPost(response.data.post);
       } catch (err) {
-        console.error("Error fetching user:", err);
+        console.error("Error fetching post:", err);
       }
     };
 
-    fetchUserDetails();
+    fetchPostDetails();
   }, []);
 
-  // Don't render until user is loaded
-  if (!user) {
-    return <p>Loading user details...</p>;
+  if (!post) {
+    return <p>Loading post details...</p>;
   }
 
   return (
     <div>
-      <h1>Name: {user.name}</h1>
-      <p>Email: {user.emailId}</p>
-      <p>Phone No: {user.phoneNum}</p>
+      <h1>Post: {post.name}</h1>
+      <p><strong>Description:</strong> {post.description}</p>
+      <p><strong>Posted by:</strong> {post.username} ({post.emailId})</p>
+      <p><strong>Phone:</strong> {post.phoneNum || "Not Available"}</p>
+      <p><strong>Address:</strong> {post.address}</p>
+      <p><strong>Status:</strong> {post.status}</p>
     </div>
   );
 }

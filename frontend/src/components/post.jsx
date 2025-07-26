@@ -15,6 +15,7 @@ function Post() {
   const [address, setAddress] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [expiryAt, setExpiryAt] = useState('');
 
   const handlePost = async (e) => {
     if (loading) return;
@@ -28,6 +29,8 @@ function Post() {
     formData.append('condition', condition);
     formData.append('img', imgpath);
     formData.append('address', address); 
+    formData.append('expiresAt', expiryAt);
+
 
     try {
       const response = await axios.post('http://localhost:2000/post', formData, {
@@ -71,6 +74,14 @@ function Post() {
           onChange={e => setAddress(e.target.value)}
           required
         /><br /><br />
+
+        <Input
+          type="datetime-local"
+          value={expiryAt}
+          onChange={e => setExpiryAt(e.target.value)}
+          required
+          label="Expiry Date & Time"
+        />
 
         <Dropdown
           options={[

@@ -15,8 +15,9 @@ app.use('/uploads', express.static('uploads'));
 const User = require('./models/userModel');
 const Post = require('./models/postModel');
 const cors = require('cors');
+const cron = require('node-cron');
 
-
+require('dotenv').config();
 app.use(express.json());
 
 // Middleware to parse URL-encoded data (from forms)
@@ -34,6 +35,24 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
 }));
+
+
+//Setting up Cron To Check For Expiry Date Every 3 Minutes
+cron.schedule('*/5 * * * *', async () => { // every 5 minutes
+  try {
+    const now = new Date();
+    const result = await Post.updateMany(
+      { expiresAt: { $lte: now }, status: 'active' },
+      { $set: { status: 'expired' } }
+    );
+    if (result.modifiedCount > 0) {
+      console.log(`${result.modifiedCount} posts marked as expired`);
+    }
+  } catch (err) {
+    console.error("Error marking expired posts:", err);
+  }
+}); 
+
 
 // Setting up multer disk storage
 const storage = multer.diskStorage({
@@ -109,7 +128,7 @@ app.post("/register", async (req, res) => {
 
 // Home page
 app.get("/home",requireLogin,async(req,res) =>{
-  const posts = await Post.find({status:"active"});
+  const posts = await Post.find({status:"active",expiresAt: { $gt: new Date() }});
   posts.reverse()
   res.json(posts)
 })
@@ -118,10 +137,14 @@ app.get("/post",requireLogin,(req,res) =>{
   res.sendFile(__dirname+"/public/post.html");
 })
 app.post("/post", upload.single('img'), async (req, res) => {
-  const { name, description, category, condition, address } = req.body;
+  const { name, description, category, condition, address,expiresAt } = req.body;
   const img = req.file;
-  const mykey = "4b5bc48ab4ab4bb1aa76d86232668660";
-  const url1 = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${mykey}`;
+  const url1 = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${process.env.mykey}`;
+  if (!expiresAt || isNaN(new Date(expiresAt))) {
+  return res.status(400).send("Invalid expiry date.");
+}
+const expiryDate = new Date(expiresAt);
+
 
   try {
     const user = await User.findOne({ emailId: req.session.email });
@@ -148,7 +171,8 @@ app.post("/post", upload.single('img'), async (req, res) => {
       imgpath: img.path,
       address,
       lat,
-      lon
+      lon,
+      expiresAt: expiryDate
     });
 
     res.redirect("/home");
@@ -165,7 +189,8 @@ app.get("/search", async (req, res) => {
     const { name, category, condition, address, radius } = req.query;
 
     // Create base query with only active posts
-    const query = { status: "active" };
+    const query = { status: "active" ,expiresAt: { $gt: new Date() }};
+    
 
     // Search By Name (case-insensitive)
     if (name) {
@@ -187,8 +212,8 @@ app.get("/search", async (req, res) => {
 
     // If address and radius are provided, apply location-based filtering
     if (address && radius) {
-      const apiKey = "4b5bc48ab4ab4bb1aa76d86232668660";
-      const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${apiKey}`;
+     
+      const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${process.env.mykey}`;
 
       // Make request to Geoapify to get lat and lon of the input address
       https.get(url, (response) => {
@@ -265,9 +290,11 @@ app.get("/history",requireLogin,async(req,res) =>{
 // details page
 app.get('/details',requireLogin, async(req, res) => {
   const email = req.query.email;
+  const postId = req.query.id;
   // Use the email to find the post or user
   const  user = await User.findOne({ emailId: email })
-  res.json({user});
+  const post = await Post.findById(postId);
+  res.json({user,post});
 });
 
 

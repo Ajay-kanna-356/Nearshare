@@ -11,7 +11,9 @@ const postSchema = new mongoose.Schema(
     imgpath: { type: String, required: true },
     status: {type:String, default:"active", enum:["active","sold"]},
     lat: {type: Number, required: true},
-    lon: {type: Number, required: true} },
+    lon: {type: Number, required: true},
+    address:{type:String,required:true},
+    expiresAt: {type: Date,required: true} },
 );
 
 module.exports = mongoose.model('Post', postSchema);
