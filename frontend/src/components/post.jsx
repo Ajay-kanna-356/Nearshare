@@ -79,7 +79,6 @@ function Post() {
           type="datetime-local"
           value={expiryAt}
           onChange={e => setExpiryAt(e.target.value)}
-          required
           label="Expiry Date & Time"
         />
 

@@ -128,7 +128,13 @@ app.post("/register", async (req, res) => {
 
 // Home page
 app.get("/home",requireLogin,async(req,res) =>{
-  const posts = await Post.find({status:"active",expiresAt: { $gt: new Date() }});
+  const posts = await Post.find({
+    status: "active",
+    $or: [
+      { expiresAt: { $gt: new Date() } },
+      { expiresAt: null }
+    ]
+  });
   posts.reverse()
   res.json(posts)
 })
@@ -140,11 +146,11 @@ app.post("/post", upload.single('img'), async (req, res) => {
   const { name, description, category, condition, address,expiresAt } = req.body;
   const img = req.file;
   const url1 = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&limit=1&apiKey=${process.env.mykey}`;
-  if (!expiresAt || isNaN(new Date(expiresAt))) {
-  return res.status(400).send("Invalid expiry date.");
-}
-const expiryDate = new Date(expiresAt);
+  let expiryDate = expiresAt ? new Date(expiresAt) : null;
 
+  if (expiryDate && isNaN(expiryDate)) {
+    return res.status(400).send("Invalid expiry date.");
+  }
 
   try {
     const user = await User.findOne({ emailId: req.session.email });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './Home.css'; 
+import '../css files/Home.css'; 
 import { useNavigate } from 'react-router-dom';
 import Button from './button';
 
