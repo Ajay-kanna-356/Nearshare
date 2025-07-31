@@ -3,6 +3,7 @@ import Button from './button';
 import { useNavigate } from 'react-router-dom';
 import Dropdown from './dropdown';
 import Input from './inputbox';
+import '../css files/search.css';
 
 function Search() {
   const navigate = useNavigate();
@@ -19,65 +20,70 @@ function Search() {
   };
 
   return (
-    <div>
-      <h2>Search</h2>
+    <div className='body'>
+      
       <br></br>
-      <form onSubmit={handleSearch}>
-        <Input
-          label = "Item Name"
-          type="text"
-          name="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <br /><br />
+      <div className="boxing">
+       <form onSubmit={handleSearch} style={{ width: "100%" }}>
+          <Input
+            className='wide-input'
+            label = "Item Name"
+            type="text"
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+                  />
+          <br /><br />
+           <div className="dropies">
+              <Dropdown
+                options={[
+                  { name: "Accessories", value: "accessories" },
+                  { name: "Kitchen Products", value: "kitchen" },
+                  { name: "Furnitures", value: "furniture" },
+                  { name: "Clothes", value: "clothes" },
+                  { name: "Electronics", value: "electronics" }
+                ]}
+                value={category}
+                label="-- Any Category --"
+                onChange={e => setCategory(e.target.value)}
+              />
+              <br />
+              
+              <Dropdown
+                options={[
+                  { name: "New", value: "new" },
+                  { name: "Used", value: "used" },
+                  { name: "Refurbished", value: "refurbished" }
+                ]}
+                value={condition}
+                label="-- Any Condition --"
+                onChange={e => setCondition(e.target.value)}
+              />
+              <br />
+            </div>
+          <Input
+            className='wide-input'
+            label="Enter address"
+            type="text"
+            name="address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          <br /><br />
 
-        <Dropdown
-          options={[
-            { name: "Accessories", value: "accessories" },
-            { name: "Kitchen Products", value: "kitchen" },
-            { name: "Furnitures", value: "furniture" },
-            { name: "Clothes", value: "clothes" },
-            { name: "Electronics", value: "electronics" }
-          ]}
-          value={category}
-          label="-- Any Category --"
-          onChange={e => setCategory(e.target.value)}
-        />
-        <br />
+          <Input
+            className='wide-input'
+            label="Search Radius (in kms)"
+            type="number"
+            name="radius"
+            value={radius}
+            onChange={(e) => setRadius(e.target.value)}
+          />
+          <br /><br />
 
-        <Dropdown
-          options={[
-            { name: "New", value: "new" },
-            { name: "Used", value: "used" },
-            { name: "Refurbished", value: "refurbished" }
-          ]}
-          value={condition}
-          label="-- Any Condition --"
-          onChange={e => setCondition(e.target.value)}
-        />
-        <br />
-
-        <Input
-          label="Enter address"
-          type="text"
-          name="address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-        <br /><br />
-
-        <Input
-          label="Search Radius (in kms)"
-          type="number"
-          name="radius"
-          value={radius}
-          onChange={(e) => setRadius(e.target.value)}
-        />
-        <br /><br />
-
-        <Button type="submit">Search</Button>
-      </form>
+          <Button type="submit">Search</Button>
+        </form>
+      </div>
     </div>
   );
 }

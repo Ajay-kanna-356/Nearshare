@@ -1,12 +1,13 @@
 .drop {
   width: 12em;
-  margin:10px;
+  margin: 10px;
   font-family: sans-serif;
   color: #86919a;
   text-transform: uppercase;
   position: relative;
   background: #485761;
   cursor: pointer;
+  user-select: none;
 }
 
 .option {
@@ -30,14 +31,16 @@
   color: #fff;
 }
 
-.drop.visible .option {
-  display: block;
-}
-
-.option:not(.placeholder) {
-  display: none;
-}
-
-.drop.visible .option:not(.placeholder) {
-  display: block;
+/* NEW: Floating dropdown box */
+.options-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #485761;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  max-height: 200px;
+  overflow-y: auto;
+  border-top: 1px solid #3b4a52;
 }

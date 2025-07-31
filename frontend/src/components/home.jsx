@@ -4,12 +4,12 @@ import '../css files/Home.css';
 import { useNavigate } from 'react-router-dom';
 import Button from './button';
 
-
 function Home() {
   const [posts, setPosts] = useState([]);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   useEffect(() => {
-    axios.get('http://localhost:2000/home', { withCredentials: true }) // You will create this route in Express
+    axios.get('http://localhost:2000/home', { withCredentials: true })
       .then(res => {
         setPosts(res.data);
       })
@@ -20,24 +20,29 @@ function Home() {
 
   return (
     <div>
-      <Button onClick={()=> navigate('/post')}>Post</Button>
-      <Button onClick={()=> navigate('/search')}>Search</Button>
-      <Button onClick={()=> navigate('/history')}>My Posts</Button>
-      <Button onClick={()=> navigate('/')}>Log Out</Button>
+      {/* 🔷 Navbar */}
+      <nav className="navbar">
+        <div className="navbar-logo">NearShare</div>
+        <div className="navbar-buttons">
+          <Button onClick={() => navigate('/post')}>Post</Button>
+          <Button onClick={() => navigate('/search')}>Search</Button>
+          <Button onClick={() => navigate('/history')}>My Posts</Button>
+          <Button onClick={() => navigate('/')}>Log Out</Button>
+        </div>
+      </nav>
 
+      {/* 🔷 Posts Section */}
       <div className="posts">
         {posts.map((post, index) => (
           <div className="post" key={index}>
-            
             <h2>{post.name}</h2>
             <br />
             <img src={`http://localhost:2000/${post.imgpath}`} alt="Post" />
             <h2>{post.username}</h2>
             <p>{post.description}</p>
-          <Button onClick={() => navigate(`/details?id=${post._id}`)}>
-          Get Details
-          </Button>
-
+            <Button onClick={() => navigate(`/details?id=${post._id}`)}>
+              Get Details
+            </Button>
           </div>
         ))}
       </div>

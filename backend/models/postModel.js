@@ -13,7 +13,9 @@ const postSchema = new mongoose.Schema(
     lat: {type: Number, required: true},
     lon: {type: Number, required: true},
     address:{type:String,required:true},
-    expiresAt: {type: Date} }
+    expiresAt: {type: Date},
+    
+  },{timestamps: true}
 );
 
 module.exports = mongoose.model('Post', postSchema);

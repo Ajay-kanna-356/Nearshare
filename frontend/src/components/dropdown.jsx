@@ -5,7 +5,7 @@ function Dropdown({ options, label, onChange, value }) {
   const [open, setOpen] = useState(false);
 
   const handleToggle = () => {
-    setOpen((prev) => !prev);
+    setOpen(prev => !prev);
   };
 
   const handleSelect = (val, e) => {
@@ -17,17 +17,15 @@ function Dropdown({ options, label, onChange, value }) {
   };
 
   return (
-    <div className={`drop ${open ? 'visible opacity withBG' : ''}`} onClick={handleToggle}>
+    <div className="drop" onClick={handleToggle}>
       <div className="option placeholder active">
         {options.find(opt => opt.value === value)?.name || label}
       </div>
 
       {open && (
-        <>
-          {/* Add default "Any" option */}
+        <div className="options-container">
           <div
             className={`option ${value === '' ? 'active' : ''}`}
-            data-value=""
             onClick={(e) => handleSelect('', e)}
           >
             {label}
@@ -37,13 +35,12 @@ function Dropdown({ options, label, onChange, value }) {
             <div
               key={i}
               className={`option ${value === opt.value ? 'active' : ''}`}
-              data-value={opt.value}
               onClick={(e) => handleSelect(opt.value, e)}
             >
               {opt.name}
             </div>
           ))}
-        </>
+        </div>
       )}
     </div>
   );

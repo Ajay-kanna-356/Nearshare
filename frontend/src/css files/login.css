@@ -6,7 +6,7 @@
 }
 
 .body{
-    background-color: #E4F9F5;
+   
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,3 +19,10 @@
     padding:30px;
     margin-top: 50px;
 }
+
+.reglog{
+  margin-top: 20px;
+  margin-left: 10px;
+  
+}
+

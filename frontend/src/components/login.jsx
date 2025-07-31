@@ -6,6 +6,7 @@ import '../css files/login.css';
 import Input from './inputbox';
 import Button from './button';
 import { Link } from 'react-router-dom';
+import DarkVeil from '../reactbits/dark';
 
 function Login() {
   const navigate = useNavigate(); // ✅ Declare here
@@ -27,38 +28,57 @@ function Login() {
   };
 
   return (
-    <div className='body'>
-    <div className='box'>
+  <div style={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+    
+    {/* Background Component */}
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+      <DarkVeil />
+    </div>
+
+    {/* Centered Login Box */}
+    <div className="box" style={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      zIndex: 1,
+      backgroundColor: 'rgba(255, 255, 255, 0.85)', // optional translucent background
+      padding: '30px',
+      borderRadius: '12px',
+      boxShadow: '0 0 10px rgba(0,0,0,0.2)'
+    }}>
       <h2>Login</h2>
       
       <form onSubmit={handleLogin}>
-      <Input
-        label="Email:"
-        type="email"
-        name="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required 
-        error={errorMsg.includes('email') ? errorMsg : ''}
-      />
-
-        <Input 
-         label = "Password:"
-         type="password"
-         name="password"
-         value= {password}
-         onChange={e => setPassword(e.target.value)}
-         required
+        <Input
+          className="full"
+          label="Email:"
+          type="email"
+          name="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required 
+          error={errorMsg.includes('email') ? errorMsg : ''}
         />
 
-        <Button type="submit">Login</Button>
+        <Input 
+          className="full"
+          label="Password:"
+          type="password"
+          name="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+
+        <Button type="submit" className="reglog">Login</Button>
         &nbsp;&nbsp;
-        <Link to="/register"><Button>Register</Button></Link>
+        <Link to="/register"><Button className="reglog">Register</Button></Link>
+
         {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
       </form>
     </div>
   </div>
-  );
+);
 }
-
 export default Login;
