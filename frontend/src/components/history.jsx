@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Dropdown from "./dropdown";
 import Button from "./button";
+import Loading from "./loading";
 
 function History() {
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchPosts = async () => {
     try {
@@ -14,12 +16,14 @@ function History() {
         withCredentials: true, 
       });
       setPosts(res.data.userposts);
+      setLoading(false);
     } catch (err) {
       console.error("Unable to retrieve User Post", err);
+      setLoading(false);
     }
   };
-
   // Fix infinite loop by using status instead of posts
+  
   useEffect(() => {
     fetchPosts();
   }, [status]); 
@@ -39,6 +43,7 @@ function History() {
       console.error("Error marking as sold", err);
     }
   };
+  if (loading) return <Loading />;
 
   return (
     <div>

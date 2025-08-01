@@ -3,20 +3,26 @@ import axios from 'axios';
 import '../css files/Home.css'; 
 import { useNavigate } from 'react-router-dom';
 import Button from './button';
+import Loading from './loading'; 
 
 function Home() {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true); // 🔸 Track loading
   const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('http://localhost:2000/home', { withCredentials: true })
       .then(res => {
         setPosts(res.data);
+        setLoading(false); // 🔸 Done loading
       })
       .catch(err => {
         console.error('Failed to fetch posts:', err);
+        setLoading(false); // 🔸 Still stop loading even if error
       });
   }, []);
+
+  if (loading) return <Loading />; 
 
   return (
     <div>

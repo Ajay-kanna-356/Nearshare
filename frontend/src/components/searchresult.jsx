@@ -3,11 +3,13 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Button from './button';
+import Loading from './loading'; 
 
 function SearchResults() {
   const [posts, setPosts] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -17,13 +19,17 @@ function SearchResults() {
           withCredentials: true
         });
         setPosts(res.data);
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching search results:", err);
+          setLoading(false);
       }
     };
     fetchResults();
   }, [location.search]);
-    
+  
+if (loading) return <Loading />;
+
   return (
     <div>
       <Button className='searchbtn' onClick={()=>navigate('/search')}>Search</Button>  

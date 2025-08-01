@@ -81,7 +81,7 @@ function Post() {
             onChange={e => setAddress(e.target.value)}
             required
           /><br /><br />
-
+          <label>&nbsp;&nbsp;&nbsp;Expiry date and time:</label>
           <Input
             className='wide-input'
             type="datetime-local"
@@ -96,7 +96,8 @@ function Post() {
                 { name: "Kitchen Products", value: "kitchen" },
                 { name: "Furnitures", value: "furniture" },
                 { name: "Clothes", value: "clothes" },
-                { name: "Electronics", value: "electronics" }
+                { name: "Electronics", value: "electronics" },
+                { name: "Consumables", value: "consumables" }
               ]}
               value={category}
               label="-- Category --"
